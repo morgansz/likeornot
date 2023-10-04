@@ -1,0 +1,20 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+
+{% block content %}
+    <h1>Welcome to Picture App!</h1>
+    <p>
+        Start evaluating your pictures!
+    </p>
+
+    {% if picture %}
+        <img src="{{ picture.image.url }}" alt="Picture" />
+        <div>
+            <a href="{% url 'like_picture' picture.id %}">Like</a>
+            <a href="{% url 'dislike_picture' picture.id %}">Dislike</a>
+        </div>
+    {% else %}
+        <p>No more pictures available.</p>
+    {% endif %}
+{% endblock %}

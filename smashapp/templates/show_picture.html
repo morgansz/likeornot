@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Show Picture</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    {% csrf_token %}
+    <input type="hidden" id="pictureId" value="{{ picture.id }}">
+    <img id="picture" src="{{ picture.image.url }}" alt="Picture">
+    <button type="button" id="likeBtn">Like</button>
+    <button type="button" id="dislikeBtn">Dislike</button>
+    
+    <script>
+        $(document).ready(function() {
+            $('#likeBtn').click(function(event) {
+                event.preventDefault(); // 阻止默认行为
+                const pictureId = $('#pictureId').val();
+                $.ajax({
+                    type: 'POST',
+                    url: `{% url 'like_picture' picture.id %}`, 
+                    data: {
+                        'picture_id': pictureId,
+                        'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.processed_image_url) {
+                            $('#picture').attr('src', response.processed_image_url);
+                        } else if (response.next_image_url) {
+                            $('#picture').attr('src', response.next_image_url);
+                            $('#pictureId').val(response.next_image_id);
+                        } else {
+                            console.error('Unexpected response', response);
+                        }
+                    },
+                    error: function(error) {
+                        console.error('Error during request', error);
+                    }
+                });
+            });
+
+            $('#dislikeBtn').click(function(event) {
+                event.preventDefault(); // 阻止默认行为
+                // 这里可以根据您的逻辑进行相应的处理，例如加载下一张图片
+            });
+        });
+    </script>
+</body>
+</html>
